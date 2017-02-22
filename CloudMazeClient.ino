@@ -18,9 +18,20 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 
+#include <Adafruit_GFX.h>
+#include <Adafruit_NeoMatrix.h>
+#include <Adafruit_NeoPixel.h>
+
 WebSocketsClient webSocket;
 const char* chipID;
+const char* wsHost = "192.168.1.249";
+uint32_t wsPort = 3001;
 int count = 0;
+
+Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(3, 3, 15,
+  NEO_MATRIX_TOP     + NEO_MATRIX_LEFT +
+  NEO_MATRIX_COLUMNS + NEO_MATRIX_PROGRESSIVE,
+  NEO_GRB            + NEO_KHZ800);
 
 struct WorldUpdate {
   const char* player;
@@ -74,15 +85,13 @@ void initTime() {
     }
 }
 
-void connectWS(const char* host, uint16_t port, const char* path = "/", boolean SSL = true) {
+void connectWS(const char* host, uint16_t port = 80, const char* path = "/", boolean SSL = false) {
     Serial.printf("Connecting to server with ID: %s\n", chipID);
     if (SSL) {
         webSocket.beginSSL(host, port, path, "", chipID);
     } else {
         webSocket.begin(host, port, path, chipID);
     }
-    //webSocket.begin("wirelessledgridstream.azurewebsites.net", 80, "/", "devices");
-    //webSocket.begin("192.168.23.186", 3001, "/", chipID);
     webSocket.onEvent(webSocketEvent);
 }
 
@@ -90,7 +99,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     switch(type) {
         case WStype_DISCONNECTED:
             Serial.printf("[WSc] Disconnected!\n");
-            webSocket.begin("192.168.23.186", 3001, "/", chipID);
+            connectWS(wsHost,wsPort);
             break;
         case WStype_CONNECTED:
             Serial.printf("[WSc] Connected to url: %s\n",  payload);
@@ -118,7 +127,7 @@ void processCloudMessage(char* cloudMessage) {
     Serial.print("CloudMessage Type: ");
     const char* type = (const char*)cloudData["type"];
     Serial.println(type);
-    //if (strncmp(type, "world-update", 12)==0) {
+    if (strcmp(type, "world-update") == 0) {
         WorldUpdate worldInfo = {
           (const char*)cloudData["player"],
           (const int)cloudData["pos_x"],
@@ -127,9 +136,9 @@ void processCloudMessage(char* cloudMessage) {
           (const char*)cloudData["surroundings"]
         };
         processWorldUpdateMessage(worldInfo);
-    //} else {
-      
-    //}
+    } else {
+
+    }
 }
 
 void sendActionMessage(char* action, char* direction) {
@@ -158,13 +167,30 @@ void setup() {
     initSerial();
     initWifi();
     initTime();
+
+    matrix.begin();
+    matrix.setBrightness(40);
     
-    connectWS("192.168.23.186",3001);
+    connectWS(wsHost,wsPort);
 }
 
 void loop() {
     webSocket.loop();
+    
+    matrix.fillScreen(matrix.Color(0,0,0));
+    
+    matrix.drawPixel(0, 0, matrix.Color(255, 0, 0));
+    matrix.drawPixel(1, 0, matrix.Color(255, 0, 0));
+    matrix.drawPixel(2, 0, matrix.Color(255, 0, 0));
+    matrix.drawPixel(0, 1, matrix.Color(0, 255, 0));
+    matrix.drawPixel(1, 1, matrix.Color(0, 255, 0));
+    matrix.drawPixel(2, 1, matrix.Color(0, 255, 0));
+    matrix.drawPixel(0, 2, matrix.Color(0, 0, 255));
+    matrix.drawPixel(1, 2, matrix.Color(0, 0, 255));
+    matrix.drawPixel(2, 2, matrix.Color(0, 0, 255));
 
+    matrix.show();
+    
     if (count < 10) {
       sendActionMessage("move", "north");
     }
