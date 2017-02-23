@@ -31,10 +31,8 @@ Pushbutton rightButton(12);
 Pushbutton aButton(16);
 Pushbutton bButton(13);
 
-bool upPressed = false;
-bool downPressed = false;
-bool leftPressed = false;
-
+const uint8_t ledGridWidth = 3;
+const uint8_t ledGridHeight = 3;
 
 WebSocketsClient webSocket;
 const char* chipID;
@@ -171,8 +169,11 @@ void processWorldUpdateMessage(WorldUpdate worldInfo) {
   drawPixels(worldInfo.surroundings);
 }
 
-void drawPixels(const char* surroundings) {
+void setPixelCoordColor(uint8_t x, uint8_t y, uint32_t color) {
+  pixels.setPixelColor((y * ledGridWidth) + x, color);
+}
 
+void drawPixels(const char* surroundings) {
   for(int i=0;i<9;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
     switch(surroundings[i]) {
@@ -184,8 +185,8 @@ void drawPixels(const char* surroundings) {
            break;
     }
   }
+  setPixelCoordColor(1,1, pixels.Color(50,50,50));
   pixels.show(); // This sends the updated pixel color to the hardware.
-
 }
 
 void processButtons() {
@@ -234,11 +235,5 @@ void setup() {
 
 void loop() {
     webSocket.loop();
-    
-    //if (count < 10) {
-    //  sendActionMessage("move", "north");
-    //}
     processButtons();
-    //count++;
-    delay(20);
 }
