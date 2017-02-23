@@ -4,24 +4,17 @@
 #include <time.h>
 #include <sys/time.h>
 #include <SPI.h>
-
 #include <ESP8266WiFi.h>
 #include <Hash.h>
-
 #include <WiFiClientSecure.h>
 #include <WiFiUdp.h>
 #include <WebSocketsClient.h>
-
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
-
-#include <Adafruit_GFX.h>
-#include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
-
 #include <Pushbutton.h>
 
 Pushbutton upButton(0);
