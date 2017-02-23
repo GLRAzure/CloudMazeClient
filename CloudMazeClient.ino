@@ -22,6 +22,20 @@
 #include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
 
+#include <Pushbutton.h>
+
+Pushbutton upButton(0);
+Pushbutton downButton(2);
+Pushbutton leftButton(14);
+Pushbutton rightButton(12);
+Pushbutton aButton(16);
+Pushbutton bButton(13);
+
+bool upPressed = false;
+bool downPressed = false;
+bool leftPressed = false;
+
+
 WebSocketsClient webSocket;
 const char* chipID;
 const char* wsHost = "192.168.1.249";
@@ -46,7 +60,6 @@ void initSerial() {
     Serial.begin(115200);
     //Serial.setDebugOutput(true);
 }
-
 void initWifi() {
 
     //WiFiManager
@@ -158,6 +171,56 @@ void processWorldUpdateMessage(WorldUpdate worldInfo) {
   Serial.println(worldInfo.pos_y);
   Serial.println(worldInfo.player_count);
   Serial.println(worldInfo.surroundings);
+  drawMatrix(worldInfo.surroundings);
+}
+
+void drawMatrix(const char* surroundings) {
+    uint32_t w = matrix.Color(255, 0, 0);
+
+    matrix.fillScreen(matrix.Color(0,0,0));
+
+    //matrix.drawPixel(0, 0, w);
+    //matrix.drawPixel(1, 0, w);
+    //matrix.drawPixel(2, 0, w);
+    //matrix.drawPixel(0, 1, matrix.Color(0, 255, 0));
+    //matrix.drawPixel(1, 1, matrix.Color(0, 255, 0));
+    //matrix.drawPixel(2, 1, matrix.Color(0, 255, 0));
+    //matrix.drawPixel(0, 2, matrix.Color(0, 0, 255));
+    //matrix.drawPixel(1, 2, matrix.Color(0, 0, 255));
+    //matrix.drawPixel(2, 2, matrix.Color(0, 0, 255));
+
+    matrix.show();
+}
+
+void processButtons() {
+  if (upButton.getSingleDebouncedPress())
+  {
+    Serial.println("Up Pressed");
+    sendActionMessage("move", "north");
+  }
+  if (downButton.getSingleDebouncedPress())
+  {
+    Serial.println("Down Pressed");
+    sendActionMessage("move", "south");
+  }
+  if (leftButton.getSingleDebouncedPress())
+  {
+    Serial.println("Left Pressed");
+    sendActionMessage("move", "west");
+  }
+  if (rightButton.getSingleDebouncedPress())
+  {
+    Serial.println("Right Pressed");
+    sendActionMessage("move", "east");
+  }
+  if (aButton.getSingleDebouncedPress())
+  {
+    Serial.println("A Pressed");
+  }
+  if (bButton.getSingleDebouncedPress())
+  {
+    Serial.println("B Pressed");
+  }
 }
 
 void setup() {
@@ -177,23 +240,10 @@ void setup() {
 void loop() {
     webSocket.loop();
     
-    matrix.fillScreen(matrix.Color(0,0,0));
-    
-    matrix.drawPixel(0, 0, matrix.Color(255, 0, 0));
-    matrix.drawPixel(1, 0, matrix.Color(255, 0, 0));
-    matrix.drawPixel(2, 0, matrix.Color(255, 0, 0));
-    matrix.drawPixel(0, 1, matrix.Color(0, 255, 0));
-    matrix.drawPixel(1, 1, matrix.Color(0, 255, 0));
-    matrix.drawPixel(2, 1, matrix.Color(0, 255, 0));
-    matrix.drawPixel(0, 2, matrix.Color(0, 0, 255));
-    matrix.drawPixel(1, 2, matrix.Color(0, 0, 255));
-    matrix.drawPixel(2, 2, matrix.Color(0, 0, 255));
-
-    matrix.show();
-    
-    if (count < 10) {
-      sendActionMessage("move", "north");
-    }
-    count++;
+    //if (count < 10) {
+    //  sendActionMessage("move", "north");
+    //}
+    processButtons();
+    //count++;
     delay(20);
 }
