@@ -42,10 +42,7 @@ const char* wsHost = "192.168.1.249";
 uint32_t wsPort = 3001;
 int count = 0;
 
-Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(3, 3, 15,
-  NEO_MATRIX_TOP     + NEO_MATRIX_LEFT +
-  NEO_MATRIX_COLUMNS + NEO_MATRIX_PROGRESSIVE,
-  NEO_GRB            + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(9, 15, NEO_GRB + NEO_KHZ800);
 
 struct WorldUpdate {
   const char* player;
@@ -171,25 +168,24 @@ void processWorldUpdateMessage(WorldUpdate worldInfo) {
   Serial.println(worldInfo.pos_y);
   Serial.println(worldInfo.player_count);
   Serial.println(worldInfo.surroundings);
-  drawMatrix(worldInfo.surroundings);
+  drawPixels(worldInfo.surroundings);
 }
 
-void drawMatrix(const char* surroundings) {
-    uint32_t w = matrix.Color(255, 0, 0);
+void drawPixels(const char* surroundings) {
 
-    matrix.fillScreen(matrix.Color(0,0,0));
+  for(int i=0;i<9;i++){
+    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+    switch(surroundings[i]) {
+       case 'w':
+           pixels.setPixelColor(i, pixels.Color(50,0,0));
+           break;
+       case ' ':
+           pixels.setPixelColor(i, pixels.Color(0,0,0));
+           break;
+    }
+  }
+  pixels.show(); // This sends the updated pixel color to the hardware.
 
-    //matrix.drawPixel(0, 0, w);
-    //matrix.drawPixel(1, 0, w);
-    //matrix.drawPixel(2, 0, w);
-    //matrix.drawPixel(0, 1, matrix.Color(0, 255, 0));
-    //matrix.drawPixel(1, 1, matrix.Color(0, 255, 0));
-    //matrix.drawPixel(2, 1, matrix.Color(0, 255, 0));
-    //matrix.drawPixel(0, 2, matrix.Color(0, 0, 255));
-    //matrix.drawPixel(1, 2, matrix.Color(0, 0, 255));
-    //matrix.drawPixel(2, 2, matrix.Color(0, 0, 255));
-
-    matrix.show();
 }
 
 void processButtons() {
@@ -231,8 +227,7 @@ void setup() {
     initWifi();
     initTime();
 
-    matrix.begin();
-    matrix.setBrightness(40);
+    pixels.begin();
     
     connectWS(wsHost,wsPort);
 }
