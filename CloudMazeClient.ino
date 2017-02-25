@@ -21,8 +21,8 @@ Pushbutton upButton(0);
 Pushbutton downButton(2);
 Pushbutton leftButton(14);
 Pushbutton rightButton(12);
-Pushbutton aButton(16);
-Pushbutton bButton(13);
+Pushbutton aButton(13);
+Pushbutton bButton(16);
 
 const uint8_t ledGridWidth = 3;
 const uint8_t ledGridHeight = 3;
