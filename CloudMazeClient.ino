@@ -29,13 +29,13 @@ const uint8_t ledGridHeight = 3;
 
 WebSocketsClient webSocket;
 const char* chipID;
-const char* wsHost = "techo2017.azurewebsites.net";
+const char* wsHost = "52.224.239.175";
 uint32_t wsPort = 80;
 int count = 0;
 
 const bool useWifiManager = false;
-const char* wifiSsid = "Tech2017";
-const char* wifiPassword = "expo2017";
+const char* wifiSsid = "techo2018";
+const char* wifiPassword = "techo2018";
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(9, 15, NEO_GRB + NEO_KHZ800);
 
@@ -184,14 +184,14 @@ void setPixelCoordColor(uint8_t x, uint8_t y, uint32_t color) {
   pixels.setPixelColor((y * ledGridWidth) + x, color);
 }
 
-void drawPixels(const char* surroundings) {
+void drawPixels(const char* surroundings) {1
   for(int i=0;i<9;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
     switch(surroundings[i]) {
       case 'w':
         pixels.setPixelColor(i, pixels.Color(50,0,0));
         break;
-      case ' ':
+      default:
         pixels.setPixelColor(i, pixels.Color(0,0,0));
         break;
     }

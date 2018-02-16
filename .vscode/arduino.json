@@ -1,0 +1,6 @@
+{
+    "sketch": "CloudMazeClient.ino",
+    "board": "esp8266:esp8266:d1_mini",
+    "configuration": "CpuFrequency=80,FlashSize=4M1M,LwIPVariant=v2mss536,Debug=Disabled,DebugLevel=None____,UploadSpeed=921600",
+    "port": "COM4"
+}
